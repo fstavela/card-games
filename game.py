@@ -18,17 +18,25 @@ class Game:
         self.generate_cards()
         self.init_players()
         self.deal_cards()
+        self.played.append(self.deck.pop())
         while True:
             self.turn()
 
     def turn(self):
         player = self.players[self.round]
-        print("It's " + player.name + "'s turn!")
+        print(f"It's {player.name}'s turn! The last played card is {self.played[-1]}.")
         print(player.name + "'s cards:")
         player.print_cards()
+        print(f"{len(player.cards)} - Draw a card")
         card = int(input("Which card would you like to play? "))
-        player.cards.pop(card)
+        while card not in range(len(player.cards) + 1):
+            card = int(input(f"Invalid option! Please choose a card in range<0, {len(player.cards)}> or draw a card"))
+        if card == len(player.cards):
+            player.cards.append(self.deck.pop())
+        else:
+            self.played.append(player.cards.pop(card))
         self.increase_round()
+        print()
 
     def increase_round(self):
         self.round += 1
@@ -52,4 +60,4 @@ class Game:
     def deal_cards(self):
         for i, player in enumerate(self.players):
             player.cards = self.cards[(i * 5):(i * 5 + 5)]
-        self.deck = self.cards[(len(self.players) + 1) * 5:]
+        self.deck = self.cards[len(self.players) * 5:]
