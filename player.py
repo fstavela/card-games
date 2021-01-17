@@ -1,3 +1,6 @@
+from card import Card
+
+
 class Player:
     def __init__(self, name: str):
         self.name = name
@@ -15,3 +18,10 @@ class Player:
 
     def sort_cards(self):
         self.cards.sort()
+
+    def play_card(self, index: int) -> Card:
+        return self.cards.pop(index)
+
+    def draw_card(self, card: Card):
+        self.cards.append(card)
+        self.sort_cards()

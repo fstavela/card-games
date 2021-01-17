@@ -28,14 +28,16 @@ class Game:
         print(player.name + "'s cards:")
         player.print_cards()
         print(f"{len(player.cards)} - Draw a card")
-        card = int(input("Which card would you like to play? "))
-        while card not in range(len(player.cards) + 1):
-            card = int(input(f"Invalid option! Please choose a card in range<0, {len(player.cards)}> or draw a card"))
-        if card == len(player.cards):
-            player.cards.append(self.deck.pop())
-            player.sort_cards()
+
+        card_index = int(input("Which card would you like to play? "))
+        while card_index not in range(len(player.cards) + 1):
+            card_index = int(input(f"Invalid option! Please choose option in range<0, {len(player.cards)}> "))
+
+        if card_index == len(player.cards):
+            player.draw_card(self.deck.pop())
         else:
-            self.played.append(player.cards.pop(card))
+            self.played.append(player.play_card(card_index))
+
         self.increase_round()
         print()
 
