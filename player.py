@@ -12,3 +12,6 @@ class Player:
     def print_cards(self):
         for i, card in enumerate(self.cards):
             print(i, "-", card)
+
+    def sort_cards(self):
+        self.cards.sort()

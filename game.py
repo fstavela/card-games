@@ -33,6 +33,7 @@ class Game:
             card = int(input(f"Invalid option! Please choose a card in range<0, {len(player.cards)}> or draw a card"))
         if card == len(player.cards):
             player.cards.append(self.deck.pop())
+            player.sort_cards()
         else:
             self.played.append(player.cards.pop(card))
         self.increase_round()
@@ -60,4 +61,5 @@ class Game:
     def deal_cards(self):
         for i, player in enumerate(self.players):
             player.cards = self.cards[(i * 5):(i * 5 + 5)]
+            player.sort_cards()
         self.deck = self.cards[len(self.players) * 5:]

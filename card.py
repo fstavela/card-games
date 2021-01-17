@@ -1,7 +1,9 @@
 from mark import Mark
 from value import Value
+from functools import total_ordering
 
 
+@total_ordering
 class Card:
     def __init__(self, mark: Mark, value: Value):
         self.mark = mark
@@ -12,3 +14,6 @@ class Card:
 
     def __eq__(self, other):
         return self.mark == other.mark and self.value == other.value
+
+    def __gt__(self, other):
+        return self.value > other.value or (self.value == other.value and self.mark > other.mark)

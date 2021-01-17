@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import IntEnum
 
 
-class Mark(Enum):
+class Mark(IntEnum):
     ACORNS = 1
     LEAVES = 2
     HEARTS = 3

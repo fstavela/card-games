@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import IntEnum
 
 
-class Value(Enum):
+class Value(IntEnum):
     SEVEN = 7
     EIGHT = 8
     NINE = 9
