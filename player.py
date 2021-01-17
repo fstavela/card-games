@@ -5,6 +5,7 @@ class Player:
     def __init__(self, name: str):
         self.name = name
         self.cards = []
+        self.loses = 0
 
     def __str__(self):
         text = "Player " + self.name + ":\n"
@@ -25,3 +26,6 @@ class Player:
     def draw_card(self, card: Card):
         self.cards.append(card)
         self.sort_cards()
+
+    def has_cards(self) -> bool:
+        return bool(len(self.cards))
