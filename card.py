@@ -1,6 +1,7 @@
+from functools import total_ordering
+
 from mark import Mark
 from value import Value
-from functools import total_ordering
 
 
 @total_ordering

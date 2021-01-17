@@ -82,7 +82,7 @@ class Game:
         dealt = 0
         for player in self.players:
             to_deal = 5 - player.loses
-            player.cards = self.cards[dealt:dealt + to_deal]
+            player.cards = self.cards[dealt : dealt + to_deal]
             player.sort_cards()
             dealt += to_deal
         self.deck = self.cards[dealt:]
