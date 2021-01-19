@@ -57,6 +57,10 @@ class Game:
             card_index = int(input(f"Invalid option! Please choose option in range<0, {len(player.cards)}> "))
         if card_index == len(player.cards):
             player.draw_card(self.deck.pop())
+            if len(self.deck) == 0:
+                print("The deck is empty! Adding already played cards back to the deck.")
+                self.deck.extend(self.played[len(self.played) - 2 :: -1])
+                self.played = [self.played[-1]]
         else:
             self.played.append(player.play_card(card_index))
 
