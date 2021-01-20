@@ -14,6 +14,7 @@ class Game:
         self.played = []
         self.round = 0
         self.winner = None
+        self.aces = 0
 
     def run(self):
         self.generate_cards()
@@ -40,10 +41,7 @@ class Game:
             player.won_last_round = False
             self.increase_round()
             return
-        print(f"It's {player.name}'s turn! The last played card is {self.played[-1]}.")
-        print(player.name + "'s cards:")
-        player.print_playable_cards(self.played[-1], any(p.won_last_round for p in self.players))
-        print(f"{len(player.cards)} - Draw a card")
+        self.print_options(player)
         self.choose_and_play(player)
         if not player.has_cards():
             player.won_last_round = True
@@ -53,20 +51,38 @@ class Game:
         self.increase_round()
         print()
 
+    def print_options(self, player: Player):
+        print(f"It's {player.name}'s turn! The last played card is {self.played[-1]}.")
+        print(player.name + "'s cards:")
+        someone_won = any(p.won_last_round for p in self.players)
+        player.print_playable_cards(self.played[-1], someone_won, bool(self.aces))
+        if self.aces:
+            print(f"{len(player.cards)} - Skip this round")
+        else:
+            print(f"{len(player.cards)} - Draw a card")
+
     def choose_and_play(self, player: Player):
-        playable = player.get_playable_cards(self.played[-1], any(p.won_last_round for p in self.players))
+        someone_won = any(p.won_last_round for p in self.players)
+        playable = player.get_playable_cards(self.played[-1], someone_won, bool(self.aces))
         card_index = int(input("Which card would you like to play? "))
         while (
             card_index not in range(len(player.cards)) or player.cards[card_index] not in playable
         ) and card_index != len(player.cards):
             card_index = int(input("You can't play this card! Please choose one of the '*' marked cards or draw. "))
         if card_index == len(player.cards):
+            if self.aces:
+                self.aces -= 1
+                return
             player.draw_card(self.deck.pop())
             if len(self.deck) == 0:
                 print("The deck is empty! Adding already played cards back to the deck.")
                 self.deck.extend(self.played[len(self.played) - 2 :: -1])
                 self.played = [self.played[-1]]
         else:
+            if self.aces:
+                self.aces -= 1
+            if player.cards[card_index].value == Value.ACE:
+                self.aces += 1
             self.played.append(player.play_card(card_index))
 
     def increase_round(self):

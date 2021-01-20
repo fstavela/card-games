@@ -16,8 +16,8 @@ class Player:
             text += str(card) + "\n"
         return text
 
-    def print_playable_cards(self, last_played: Card, someone_won: bool):
-        playable = self.get_playable_cards(last_played, someone_won)
+    def print_playable_cards(self, last_played: Card, someone_won: bool, ace: bool):
+        playable = self.get_playable_cards(last_played, someone_won, ace)
         for i, card in enumerate(self.cards):
             print(i, "-", card, end=" *\n" if card in playable else "\n")
 
@@ -34,8 +34,11 @@ class Player:
     def has_cards(self) -> bool:
         return bool(len(self.cards))
 
-    def get_playable_cards(self, last_played: Card, someone_won: bool) -> list[Card]:
-        playable = list(filter(last_played.can_be_played, self.cards))
-        if someone_won and Card(Mark.HEARTS, Value.SEVEN) in self.cards:
-            playable.append(Card(Mark.HEARTS, Value.SEVEN))
+    def get_playable_cards(self, last_played: Card, someone_won: bool, ace: bool) -> list[Card]:
+        if ace:
+            playable = list(filter(lambda card: card.value == Value.ACE, self.cards))
+        else:
+            playable = list(filter(last_played.can_be_played, self.cards))
+            if someone_won and Card(Mark.HEARTS, Value.SEVEN) in self.cards:
+                playable.append(Card(Mark.HEARTS, Value.SEVEN))
         return playable
