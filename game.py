@@ -37,14 +37,16 @@ class Game:
     def turn(self):
         player = self.players[self.round]
         if not player.has_cards():
+            player.won_last_round = False
             self.increase_round()
             return
         print(f"It's {player.name}'s turn! The last played card is {self.played[-1]}.")
         print(player.name + "'s cards:")
-        player.print_playable_cards(self.played[-1])
+        player.print_playable_cards(self.played[-1], any(p.won_last_round for p in self.players))
         print(f"{len(player.cards)} - Draw a card")
         self.choose_and_play(player)
         if not player.has_cards():
+            player.won_last_round = True
             print(f"{player.name} won this round! Congratulations!")
             if self.winner is None:
                 self.winner = player
@@ -52,7 +54,7 @@ class Game:
         print()
 
     def choose_and_play(self, player: Player):
-        playable = player.get_playable_cards(self.played[-1])
+        playable = player.get_playable_cards(self.played[-1], any(p.won_last_round for p in self.players))
         card_index = int(input("Which card would you like to play? "))
         while (
             card_index not in range(len(player.cards)) or player.cards[card_index] not in playable
