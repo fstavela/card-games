@@ -73,17 +73,20 @@ class Game:
             if self.aces:
                 self.aces -= 1
                 return
-            player.draw_card(self.deck.pop())
-            if len(self.deck) == 0:
-                print("The deck is empty! Adding already played cards back to the deck.")
-                self.deck.extend(self.played[len(self.played) - 2 :: -1])
-                self.played = [self.played[-1]]
+            self.draw_card(player)
         else:
             if self.aces:
                 self.aces -= 1
             if player.cards[card_index].value == Value.ACE:
                 self.aces += 1
             self.played.append(player.play_card(card_index))
+
+    def draw_card(self, player: Player):
+        player.draw_card(self.deck.pop())
+        if len(self.deck) == 0:
+            print("The deck is empty! Adding already played cards back to the deck.")
+            self.deck.extend(self.played[len(self.played) - 2 :: -1])
+            self.played = [self.played[-1]]
 
     def increase_round(self):
         self.round += 1
