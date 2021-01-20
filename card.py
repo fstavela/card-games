@@ -18,3 +18,11 @@ class Card:
 
     def __gt__(self, other):
         return self.value > other.value or (self.value == other.value and self.mark > other.mark)
+
+    def can_be_played(self, last_played) -> bool:
+        leaves_unter = Card(Mark.LEAVES, Value.UNTER)
+        if last_played == leaves_unter or self == leaves_unter:
+            return True
+        if last_played.mark == self.mark or last_played.value == self.value:
+            return True
+        return False

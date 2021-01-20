@@ -41,7 +41,7 @@ class Game:
             return
         print(f"It's {player.name}'s turn! The last played card is {self.played[-1]}.")
         print(player.name + "'s cards:")
-        player.print_cards()
+        player.print_playable_cards(self.played[-1])
         print(f"{len(player.cards)} - Draw a card")
         self.choose_and_play(player)
         if not player.has_cards():
@@ -52,9 +52,12 @@ class Game:
         print()
 
     def choose_and_play(self, player: Player):
+        playable = player.get_playable_cards(self.played[-1])
         card_index = int(input("Which card would you like to play? "))
-        while card_index not in range(len(player.cards) + 1):
-            card_index = int(input(f"Invalid option! Please choose option in range<0, {len(player.cards)}> "))
+        while (
+            card_index not in range(len(player.cards)) or player.cards[card_index] not in playable
+        ) and card_index != len(player.cards):
+            card_index = int(input("You can't play this card! Please choose one of the '*' marked cards or draw. "))
         if card_index == len(player.cards):
             player.draw_card(self.deck.pop())
             if len(self.deck) == 0:
