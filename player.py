@@ -41,6 +41,8 @@ class Player:
             playable = list(filter(lambda card: card.value == Value.ACE, self.cards))
         elif seven:
             playable = list(filter(lambda card: card.value == Value.SEVEN, self.cards))
+            if Card(Mark.LEAVES, Value.UNTER) in self.cards:
+                playable.append(Card(Mark.LEAVES, Value.UNTER))
         else:
             playable = list(filter(played.can_be_played, self.cards))
             if someone_won and Card(Mark.HEARTS, Value.SEVEN) in self.cards:

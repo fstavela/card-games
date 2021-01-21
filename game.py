@@ -26,11 +26,7 @@ class Game:
             shuffle(self.cards)
             self.deal_cards()
             self.played.append(self.deck.pop())
-            while sum(player.has_cards() for player in self.players) > 1 or (
-                any(player.has_seven_of_hearts() for player in self.players)
-                and any(p.won_last_round for p in self.players)
-                and not self.aces
-            ):
+            while not self.game_ended():
                 self.turn()
             loser = list(filter(lambda player: player.has_cards(), self.players))[0]
             loser.loses += 1
@@ -89,6 +85,8 @@ class Game:
             self.aces -= 1
         if card.value == Value.ACE:
             self.aces += 1
+        if card == Card(Mark.LEAVES, Value.UNTER):
+            self.sevens = 0
         if card.value == Value.SEVEN:
             if card.mark == Mark.HEARTS and any(p.won_last_round for p in self.players) and not self.sevens:
                 print("What would you like to do?")
@@ -102,6 +100,13 @@ class Game:
             else:
                 self.sevens += 1
         self.played.append(card)
+
+    def game_ended(self) -> bool:
+        return sum(player.has_cards() for player in self.players) <= 1 and (
+            all(not player.has_seven_of_hearts() for player in self.players)
+            or all(not player.won_last_round for player in self.players)
+            or self.aces
+        )
 
     def special_effect(self, player: Player):
         if self.aces:
