@@ -15,6 +15,7 @@ class Game:
         self.round = 0
         self.winner = None
         self.aces = 0
+        self.sevens = 0
 
     def run(self):
         self.generate_cards()
@@ -25,7 +26,11 @@ class Game:
             shuffle(self.cards)
             self.deal_cards()
             self.played.append(self.deck.pop())
-            while sum(player.has_cards() for player in self.players) > 1:
+            while sum(player.has_cards() for player in self.players) > 1 or (
+                any(player.has_seven_of_hearts() for player in self.players)
+                and any(p.won_last_round for p in self.players)
+                and not self.aces
+            ):
                 self.turn()
             loser = list(filter(lambda player: player.has_cards(), self.players))[0]
             loser.loses += 1
@@ -37,8 +42,8 @@ class Game:
 
     def turn(self):
         player = self.players[self.round]
+        player.won_last_round = False
         if not player.has_cards():
-            player.won_last_round = False
             self.increase_round()
             return
         self.print_options(player)
@@ -55,31 +60,67 @@ class Game:
         print(f"It's {player.name}'s turn! The last played card is {self.played[-1]}.")
         print(player.name + "'s cards:")
         someone_won = any(p.won_last_round for p in self.players)
-        player.print_playable_cards(self.played[-1], someone_won, bool(self.aces))
+        last_player = sum(p.has_cards() for p in self.players) == 1
+        player.print_playable_cards(self.played[-1], someone_won, bool(self.aces), bool(self.sevens), last_player)
         if self.aces:
             print(f"{len(player.cards)} - Skip this round")
+        elif self.sevens:
+            print(f"{len(player.cards)} - Draw {3 * self.sevens} cards")
         else:
             print(f"{len(player.cards)} - Draw a card")
 
     def choose_and_play(self, player: Player):
         someone_won = any(p.won_last_round for p in self.players)
-        playable = player.get_playable_cards(self.played[-1], someone_won, bool(self.aces))
+        last = sum(p.has_cards() for p in self.players) == 1
+        playable = player.get_playable_cards(self.played[-1], someone_won, bool(self.aces), bool(self.sevens), last)
         card_index = int(input("Which card would you like to play? "))
         while (
             card_index not in range(len(player.cards)) or player.cards[card_index] not in playable
         ) and card_index != len(player.cards):
             card_index = int(input("You can't play this card! Please choose one of the '*' marked cards or draw. "))
         if card_index == len(player.cards):
-            if self.aces:
-                self.aces -= 1
-                return
-            self.draw_card(player)
+            self.special_effect(player)
         else:
-            if self.aces:
-                self.aces -= 1
-            if player.cards[card_index].value == Value.ACE:
-                self.aces += 1
-            self.played.append(player.play_card(card_index))
+            card = player.play_card(card_index)
+            self.play_card(card)
+
+    def play_card(self, card: Card):
+        if self.aces:
+            self.aces -= 1
+        if card.value == Value.ACE:
+            self.aces += 1
+        if card.value == Value.SEVEN:
+            if card.mark == Mark.HEARTS and any(p.won_last_round for p in self.players) and not self.sevens:
+                print("What would you like to do?")
+                print("0 - Use this card as a regular seven")
+                print("1 - Return someone to game")
+                opt = int(input())
+                if opt:
+                    self.play_seven_of_hearts()
+                else:
+                    self.sevens += 1
+            else:
+                self.sevens += 1
+        self.played.append(card)
+
+    def special_effect(self, player: Player):
+        if self.aces:
+            self.aces -= 1
+        elif self.sevens:
+            for i in range(3 * self.sevens):
+                self.draw_card(player)
+            self.sevens = 0
+        else:
+            self.draw_card(player)
+
+    def play_seven_of_hearts(self):
+        print("Whom would you like to return to game?")
+        winners = list(filter(lambda p: p.won_last_round, self.players))
+        for i, p in enumerate(winners):
+            print(f"{i} - {p.name}")
+        index = int(input())
+        for i in range(3):
+            self.draw_card(winners[index])
 
     def draw_card(self, player: Player):
         player.draw_card(self.deck.pop())
