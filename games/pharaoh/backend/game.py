@@ -101,13 +101,6 @@ class Game:
                 self.sevens += 1
         self.played.append(card)
 
-    def game_ended(self) -> bool:
-        return sum(player.has_cards() for player in self.players) <= 1 and (
-            all(not player.has_seven_of_hearts() for player in self.players)
-            or all(not player.won_last_round for player in self.players)
-            or self.aces
-        )
-
     def special_effect(self, player: Player):
         if self.aces:
             self.aces -= 1
@@ -160,3 +153,10 @@ class Game:
             player.sort_cards()
             dealt += to_deal
         self.deck = self.cards[dealt:]
+
+    def game_ended(self) -> bool:
+        return sum(player.has_cards() for player in self.players) <= 1 and (
+            all(not player.has_seven_of_hearts() for player in self.players)
+            or all(not player.won_last_round for player in self.players)
+            or self.aces
+        )
